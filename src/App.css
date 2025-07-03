@@ -1,0 +1,29 @@
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+[class^="display-box-"] {
+  height: 500px;
+  width: 500px;
+  border: 2px solid black;
+  margin: 0 auto;
+  caret-color: transparent;
+}
+
+input:user-valid {
+  border: 2px green solid;
+}
+
+input:user-invalid {
+  border: 2px red dashed;
+}
+
+main {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
