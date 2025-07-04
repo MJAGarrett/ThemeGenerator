@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { alternative, optional, scanLetter, seq, seqL, seqR } from "../../src/parsers/utils";
+import { alternative, optional, parseNumber, scanLetter, seq, seqL, seqR } from "../../src/parsers/utils";
 import { isNone, isSome, Some } from "../../src/Monads/Optional";
+import { assertIsNonNull } from "../utils/test_utils";
 
 describe("Utility Parsers", () => {
   describe("ScanLetter", () => {
@@ -8,12 +9,12 @@ describe("Utility Parsers", () => {
 
     it("should return the parsed string and the letter on successful parse", () => {
       const res = scanA("Apple");
-      expect(res).not.toBeNull();
+      assertIsNonNull(res);
 
       const {
         string,
         result,
-      } = res!;
+      } = res;
 
       expect(string === "pple").toBeTruthy();
       expect(result === "A").toBeTruthy();
@@ -31,14 +32,14 @@ describe("Utility Parsers", () => {
       const res1 = A_or_a("A string");
       const res2 = A_or_a("a undercase string");
 
-      expect(res1).not.toBeNull();
-      expect(res2).not.toBeNull();
+      assertIsNonNull(res1);
+      assertIsNonNull(res2);
 
-      expect(res1!.string === " string").toBeTruthy();
-      expect(res1!.result === "A").toBeTruthy();
+      expect(res1.string === " string").toBeTruthy();
+      expect(res1.result === "A").toBeTruthy();
 
-      expect(res2!.string === " undercase string").toBeTruthy();
-      expect(res2!.result === "a").toBeTruthy();
+      expect(res2.string === " undercase string").toBeTruthy();
+      expect(res2.result === "a").toBeTruthy();
     });
 
     it("should return null if neither parser can successfully parse the input", () => {
@@ -59,8 +60,8 @@ describe("Utility Parsers", () => {
       it("should combine the results of both parsers on a successful parse", () => {
         const res = scanAthenB("AB Success");
 
-        expect(res).not.toBeNull();
-        const { string, result } = res!;
+        assertIsNonNull(res);
+        const { string, result } = res;
 
         expect(string).toBe(" Success");
         expect(result).toEqual([ "A", "B" ]);
@@ -77,10 +78,10 @@ describe("Utility Parsers", () => {
 
       it("should return the result of the left parser on a successful parse", () => {
         const res = scanAandIgnoreB("AB rest");
-        expect(res).not.toBeNull();
+        assertIsNonNull(res);
 
-        expect(res!.string === " rest");
-        expect(res!.result === "A");
+        expect(res.string === " rest");
+        expect(res.result === "A");
       });
     });
 
@@ -94,10 +95,10 @@ describe("Utility Parsers", () => {
 
       it("should return the result of the right parser on a successful parse", () => {
         const res = ignoreAandScanB("AB rest");
-        expect(res).not.toBeNull();
+        assertIsNonNull(res);
 
-        expect(res!.string === " rest");
-        expect(res!.result === "B");
+        expect(res.string === " rest");
+        expect(res.result === "B");
       });
     });
   });
@@ -116,6 +117,41 @@ describe("Utility Parsers", () => {
       expect(string).toBe(" string");
       expect(isSome(result)).toBeTruthy();
       expect((result as Some<string>).payload).toBe("A");
+    });
+  });
+
+  describe("Number Parsing", () => {
+    it("should parse a valid integer", () => {
+      const integer = "-12";
+
+      const res = parseNumber(integer);
+
+      assertIsNonNull(res);
+      const { string, result } = res;
+      expect(string).toBe("");
+      expect(result).toBe(-12);
+    });
+
+    it("should parse a valid decimal number", () => {
+      const decimal = "12.41";
+
+      const res = parseNumber(decimal);
+
+      assertIsNonNull(res);
+      const { string, result } = res;
+      expect(string).toBe("");
+      expect(result).toBe(12.41);
+    });
+
+    it("should parse up to the period if a decimal value does not follow", () => {
+      const number = "44112.";
+
+      const res = parseNumber(number);
+
+      assertIsNonNull(res);
+      const { string, result } = res;
+      expect(string).toBe(".");
+      expect(result).toBe(44112);
     });
   });
 });

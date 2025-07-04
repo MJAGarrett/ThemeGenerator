@@ -46,7 +46,7 @@ export const normalizeHSL =
     };
   };
 
-export const formatHSLString = (color: HSL, precision: number = 2): string => {
+export const formatHSLString = (color: HSL, precision = 2): string => {
   const { hue, saturation, lightness } =
     isDenormalized(color) ? normalizeHSL(color) : color;
 

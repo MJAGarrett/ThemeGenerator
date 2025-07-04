@@ -2,6 +2,7 @@ import { RGBColor } from "../../src/color/RGB";
 import rgbParser from "../../src/parsers/RGBParser";
 
 import { it, expect, describe } from "vitest";
+import { assertIsNonNull } from "../utils/test_utils";
 
 describe("RGB Parsing", () => {
   const invalidRGBStrings = [
@@ -37,8 +38,8 @@ describe("RGB Parsing", () => {
     };
 
     for (const [ actual, expected ] of results) {
-      expect(actual).not.toBeNull();
-      expect(isSameColor(actual!, expected)).toBeTruthy();
+      assertIsNonNull(actual);
+      expect(isSameColor(actual, expected)).toBeTruthy();
     }
   });
 });

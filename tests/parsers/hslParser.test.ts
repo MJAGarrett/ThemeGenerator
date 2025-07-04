@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import hslParser from "../../src/parsers/HSLParser";
 import { HSLColor } from "../../src/color/HSL";
+import { assertIsNonNull } from "../utils/test_utils";
 
 describe("HSL Parser", () => {
   it("Valid HSL strings should parse", () => {
@@ -20,8 +21,8 @@ describe("HSL Parser", () => {
     };
 
     for (const [ actual, expected ] of results) {
-      expect(actual).not.toBeNull();
-      expect(isSameColor(actual!, expected)).toBeTruthy();
+      assertIsNonNull(actual);
+      expect(isSameColor(actual, expected)).toBeTruthy();
     }
   });
 
