@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import "./App.css";
 import { formatRGBString, normalizeRGB } from "./color/RGB.ts";
-import { rgbParser } from "./parsers/RGBParser.ts";
+import rgbParser from "./parsers/RGBParser.ts";
 import hslParser from "./parsers/HSLParser.ts";
 import { formatHSLString, normalizeHSL } from "./color/HSL.ts";
 import { HSLToRGB, RGBToHSL } from "./color/Conversions.ts";
@@ -44,23 +44,26 @@ const App = () => {
     <main className="main">
 
       <div className="rgb-entry">
-        <label htmlFor="rgbInput">RGB: </label>
-        <input onChange={onRGBChange}
-          type="text" name="rgb" id="rgbInput" maxLength={7}
-          value={RGBString}
+        <label htmlFor="rgbInput">{"RGB: "}</label>
+        <input
+          onChange={ onRGBChange }
+          type="text" name="rgb" id="rgbInput" maxLength={ 7 }
+          value={ RGBString }
           pattern="#([0-9A-Fa-f]{3,3}|[0-9A-Fa-f]{6,6})"
         />
         <div style={{ backgroundColor: RGBBackgroundColor }} className="display-box-rgb"></div>
       </div>
 
       <div className="hsl-entry">
-        <label htmlFor="hslInput">HSL: </label>
-        <input onChange={onHSLChange}
-          type="text" name="hsl" id="hslInput" value={HSLString}
+        <label htmlFor="hslInput">{"HSL: "}</label>
+        <input
+          onChange={ onHSLChange }
+          type="text" name="hsl" id="hslInput" value={ HSLString }
         />
         <div style={{ backgroundColor: HSLBackgroundColor }} className="display-box-hsl"></div>
-        <input value={RGBBackgroundColor} onChange={onRGBChange} type="color" name="hslColor" id="hslColor" />
+        <input value={ RGBBackgroundColor } onChange={ onRGBChange } type="color" name="hslColor" id="hslColor" />
       </div>
+
     </main>
   );
 };

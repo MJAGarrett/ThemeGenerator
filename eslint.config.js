@@ -54,6 +54,24 @@ export default tseslint.config([
       "@stylistic/no-multi-spaces": ["error" ],
       "@stylistic/no-multiple-empty-lines": ["error", { "max": 2, "maxEOF": 0, "maxBOF": 0 } ],
       "@stylistic/no-trailing-spaces": "error",
-    }
+
+      "@stylistic/jsx-child-element-spacing": "error",
+      "@stylistic/jsx-closing-bracket-location": "error",
+      "@stylistic/jsx-closing-tag-location": "error",
+      "@stylistic/jsx-curly-brace-presence": [ "error", {
+        "propElementValues": "always",
+      } ],
+      "@stylistic/jsx-curly-spacing": [ "error", { 
+        "when": "always",
+        "chilren": true,
+        "spacing": {
+          "objectLiterals": "never",
+        },
+      }],
+      "@stylistic/jsx-equals-spacing": ["error", "never" ],
+      "@stylistic/jsx-first-prop-new-line": "error",
+      "@stylistic/jsx-indent-props": ["error", 2],
+      "@stylistic/jsx-quotes": [ "error", "prefer-double" ],
+    },
   },
 ]);

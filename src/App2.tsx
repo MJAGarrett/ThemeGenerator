@@ -33,11 +33,14 @@ const ColorCanvas = (props: { color: string, width: number, height: number }) =>
     ctx.fillRect(0, 0, width, height);
   }, [ color, width, height ]);
 
-  return <canvas
-    style={{ border: "2px solid black" }}
-    ref={canvasRef}
-    width={width}
-    height={height}></canvas>;
+  return (
+    <canvas
+      style={{ border: "2px solid black" }}
+      ref={ canvasRef }
+      width={ width }
+      height={ height }
+    >
+    </canvas>);
 };
 
 const App2 = () => {
@@ -74,18 +77,21 @@ const App2 = () => {
         alignItems: "start",
         gap: "1em",
       }}
-      className="color input">
-      <label htmlFor="strat">Type: </label>
+      className="color input"
+    >
+      <label htmlFor="strat">{"Type: "}</label>
       <select
-        onChange={(e) => onSelection(e.target.value as "rgb" | "hsl")}
-        id="strat" name="strat">
-        { options.map((opt) => <option key={opt} value={opt}>{opt}</option>) }
+        onChange={ (e) => onSelection(e.target.value as "rgb" | "hsl") }
+        id="strat" name="strat"
+      >
+        { options.map((opt) => <option key={ opt } value={ opt }>{opt}</option>) }
       </select>
       <input
-        value={input}
-        onChange={(e) => onInput(e.target.value)}
-        type="text" name="colorInput" id="colorInput" />
-      <ColorCanvas color={backgroundColor} width={50} height={50} />
+        value={ input }
+        onChange={ (e) => onInput(e.target.value) }
+        type="text" name="colorInput" id="colorInput"
+      />
+      <ColorCanvas color={ backgroundColor } width={ 50 } height={ 50 } />
     </div>
   );
 
