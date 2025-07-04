@@ -1,4 +1,5 @@
 import { clamp } from "../utils/math_utils";
+import { Byte, makeByte, makeNormalized, Normalized } from "../utils/number_types";
 
 /**
  * An RGBColor should have 3 fields for red, green, and blue. Each color
@@ -6,22 +7,43 @@ import { clamp } from "../utils/math_utils";
  */
 export interface RGBColor {
   kind: "denormalized";
-  readonly red: number;
-  readonly green: number;
-  readonly blue: number;
+  readonly red: Byte;
+  readonly green: Byte;
+  readonly blue: Byte;
 }
 
 export interface RGBColorNormalized {
   kind: "normalized";
-  readonly red: number;
-  readonly green: number;
-  readonly blue: number;
+  readonly red: Normalized;
+  readonly green: Normalized;
+  readonly blue: Normalized;
 }
 
-export type RGB = RGBColor | RGBColorNormalized;
+type RGB = RGBColor | RGBColorNormalized;
+
+
+export const makeRGBColor = (red: number, green: number, blue: number): RGBColor => {
+  return {
+    kind: "denormalized",
+    red: makeByte(red),
+    green: makeByte(green),
+    blue: makeByte(blue),
+  };
+};
+
+export const makeRGBColorNormalized =
+  (red: number, green: number, blue: number): RGBColorNormalized => {
+    return {
+      kind: "normalized",
+      red: makeNormalized(red),
+      green: makeNormalized(green),
+      blue: makeNormalized(blue),
+    };
+  };
+
 
 export const normalizeRGB = ({ red, green, blue }: RGBColor): RGBColorNormalized => {
-  const normalizeValue = (n: number) => clamp(n, 0, 255) / 255;
+  const normalizeValue = (n: number) => makeNormalized(clamp(n, 0, 255) / 255);
 
   return {
     kind: "normalized",

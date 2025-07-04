@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import hslParser from "../../src/parsers/HSLParser";
-import { HSLColor } from "../../src/color/HSL";
-import { assertIsNonNull } from "../utils/test_utils";
+import { HSLColor, makeHSLColor } from "../../src/color/HSL";
+import { assertIsNonNull } from "../test_utils/test_utils";
 
 describe("HSL Parser", () => {
   it("Valid HSL strings should parse", () => {
     const validStringsAndTheirValues: [string, HSLColor][] = [
-      [ "hsl(0, 0%, 0%)", { kind: "denormalized", hue: 0, lightness: 0, saturation: 0 }],
-      [ "hsl(  350  , 30% , 40%  )", { kind: "denormalized", hue: 350, lightness: 40, saturation: 30 }],
-      [ "hsl(  3350  , 30% , 40%  )", { kind: "denormalized", hue: 3350, lightness: 40, saturation: 30 }],
+      [ "hsl(0, 0%, 0%)", makeHSLColor(0, 0, 0) ],
+      [ "hsl(  350  , 30% , 40%  )", makeHSLColor(350, 30, 40) ],
+      [ "hsl(  3350  , 30% , 40%  )", makeHSLColor(3350, 30, 40) ],
     ];
 
     const results = validStringsAndTheirValues.map(
@@ -34,6 +34,7 @@ describe("HSL Parser", () => {
       "hsl(0, 0%, 0%,)", // Extra ,
       "hsl(0, 0, 0%)", // Missing %
       "hsl(, 0%, 0%)", // Missing hue
+      "hsl(0, 410%, 0%)", // Percent value greater than 100
     ];
 
     const results = invalidHSLStrings.map(hslParser);

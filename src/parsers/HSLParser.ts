@@ -1,4 +1,4 @@
-import { HSLColor } from "../color/HSL";
+import { HSLColor, makeHSLColor } from "../color/HSL";
 import { alternative, finishParse, parseNumber, Parser, scanLetter, seqL, seqR, skipWhitespaceBetween } from "./utils";
 
 const hslParser_imp: Parser<HSLColor> = (string) => {
@@ -22,15 +22,15 @@ const hslParser_imp: Parser<HSLColor> = (string) => {
 
   if (!r3) return null;
 
-  return {
-    string: r3.string,
-    result: {
-      kind: "denormalized",
-      hue: r1.result,
-      saturation: r2.result,
-      lightness: r3.result,
-    },
-  };
+  try {
+    return {
+      string: r3.string,
+      result: makeHSLColor(r1.result, r2.result, r3.result),
+    };
+  }
+  catch {
+    return null;
+  }
 };
 
 const scanHSLLiteral: Parser<string> = (() => {

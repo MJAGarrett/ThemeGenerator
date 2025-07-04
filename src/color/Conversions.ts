@@ -1,5 +1,5 @@
-import { HSLColorNormalized } from "./HSL";
-import { RGBColorNormalized } from "./RGB";
+import { HSLColorNormalized, makeHSLColorNormalized } from "./HSL";
+import { makeRGBColorNormalized, RGBColorNormalized } from "./RGB";
 
 export function RGBToHSL(rgb: RGBColorNormalized): HSLColorNormalized {
   const {
@@ -31,12 +31,7 @@ export function RGBToHSL(rgb: RGBColorNormalized): HSLColorNormalized {
   const lightness = (cmax + cmin) / 2;
   const saturation = chroma === 0 ? 0 : chroma / (1 - Math.abs(2 * lightness - 1));
 
-  return {
-    kind: "normalized",
-    hue,
-    saturation: saturation,
-    lightness: lightness,
-  };
+  return makeHSLColorNormalized(hue, saturation, lightness);
 }
 
 export function HSLToRGB({ hue, saturation, lightness }: HSLColorNormalized): RGBColorNormalized {
@@ -70,11 +65,7 @@ export function HSLToRGB({ hue, saturation, lightness }: HSLColorNormalized): RG
   }
 
   const m = L - chroma / 2;
+  const { red, green, blue } = rgb;
 
-  return {
-    kind: "normalized",
-    red: rgb.red + m,
-    green: rgb.green + m,
-    blue: rgb.blue + m,
-  };
+  return makeRGBColorNormalized(red + m, green + m, blue + m);
 }

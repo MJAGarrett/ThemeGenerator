@@ -1,4 +1,4 @@
-import { type RGBColor } from "../color/RGB";
+import { makeRGBColor, type RGBColor } from "../color/RGB";
 import { alternative, finishParse, nTimes, parseHexDigit, scanLetter, seq, seqR, type Parser } from "./utils";
 
 const rgbParser6Digits: Parser<RGBColor> = (string: string) => {
@@ -16,41 +16,41 @@ const rgbParser6Digits: Parser<RGBColor> = (string: string) => {
 
   const res = seqR(scanLetter("#"))(nTimes(3)(parseTwoDigits))(string);
 
-  if (res) {
-    const [ red, green, blue ] = res.result.flat();
+  if (!res) return null;
 
+  const [ red, green, blue ] = res.result.flat();
+
+  try {
     return {
       string: res.string,
-      result: {
-        kind: "denormalized",
-        red,
-        green,
-        blue,
-      },
+      result: makeRGBColor(red, green, blue),
     };
   }
-
-  return null;
+  catch {
+    return null;
+  }
 };
 
 const rgbParser3Digits: Parser<RGBColor> = (string: string) => {
   const res = seqR(scanLetter("#"))(nTimes(3)(parseHexDigit))(string);
 
-  if (res) {
-    const [ red, green, blue ] = res.result.flat();
+  if (!res) return null;
 
+  const [ red, green, blue ] = res.result.flat();
+
+  try {
     return {
       string: res.string,
-      result: {
-        kind: "denormalized",
-        red: red * 16 + red,
-        green: green * 16 + green,
-        blue: blue * 16 + blue,
-      },
+      result: makeRGBColor(
+        red * 16 + red,
+        green * 16 + green,
+        blue * 16 + blue,
+      ),
     };
   }
-
-  return null;
+  catch {
+    return null;
+  }
 };
 
 const rgbParser: (str: string) => RGBColor | null =

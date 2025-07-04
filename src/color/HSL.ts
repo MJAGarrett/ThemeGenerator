@@ -1,4 +1,5 @@
 import { clamp } from "../utils/math_utils";
+import { CircleDegree, makeCircleDegree, makeNormalized, makeNumber0To100, Normalized, Number0To100 } from "../utils/number_types";
 
 /**
  * An object containing the three values for HSL with no ranges defined for each value.
@@ -7,8 +8,8 @@ import { clamp } from "../utils/math_utils";
 export interface HSLColor {
   readonly kind: "denormalized";
   readonly hue: number;
-  readonly saturation: number;
-  readonly lightness: number;
+  readonly saturation: Number0To100;
+  readonly lightness: Number0To100;
 }
 
 /**
@@ -17,9 +18,9 @@ export interface HSLColor {
  */
 export interface HSLColorNormalized {
   readonly kind: "normalized";
-  readonly hue: number;
-  readonly saturation: number;
-  readonly lightness: number;
+  readonly hue: CircleDegree;
+  readonly saturation: Normalized;
+  readonly lightness: Normalized;
 }
 
 export type HSL = HSLColor | HSLColorNormalized;
@@ -32,6 +33,25 @@ export const isDenormalized = (hsl: HSL): hsl is HSLColor => {
   return hsl.kind === "denormalized";
 };
 
+export const makeHSLColor = (hue: number, sat: number, light: number): HSLColor => {
+  return {
+    kind: "denormalized",
+    hue,
+    saturation: makeNumber0To100(sat),
+    lightness: makeNumber0To100(light),
+  };
+};
+
+export const makeHSLColorNormalized =
+  (hue: number, sat: number, light: number): HSLColorNormalized => {
+    return {
+      kind: "normalized",
+      hue: makeCircleDegree(hue),
+      saturation: makeNormalized(sat),
+      lightness: makeNormalized(light),
+    };
+  };
+
 export const normalizeHSL =
   ({ hue, saturation, lightness }: HSLColor): HSLColorNormalized => {
     const h = hue % 360 + (hue < 0 ? 360 : 0);
@@ -40,9 +60,9 @@ export const normalizeHSL =
 
     return {
       kind: "normalized",
-      hue: h,
-      saturation: s,
-      lightness: l,
+      hue: makeCircleDegree(h),
+      saturation: makeNormalized(s),
+      lightness: makeNormalized(l),
     };
   };
 

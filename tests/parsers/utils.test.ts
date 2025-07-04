@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { alternative, optional, parseNumber, scanLetter, seq, seqL, seqR } from "../../src/parsers/utils";
 import { isNone, isSome, Some } from "../../src/Monads/Optional";
-import { assertIsNonNull } from "../utils/test_utils";
+import { assertIsNonNull } from "../test_utils/test_utils";
 
 describe("Utility Parsers", () => {
   describe("ScanLetter", () => {

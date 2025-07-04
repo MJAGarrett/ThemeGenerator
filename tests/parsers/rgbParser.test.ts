@@ -1,8 +1,8 @@
-import { RGBColor } from "../../src/color/RGB";
+import { makeRGBColor, RGBColor } from "../../src/color/RGB";
 import rgbParser from "../../src/parsers/RGBParser";
 
 import { it, expect, describe } from "vitest";
-import { assertIsNonNull } from "../utils/test_utils";
+import { assertIsNonNull } from "../test_utils/test_utils";
 
 describe("RGB Parsing", () => {
   const invalidRGBStrings = [
@@ -14,10 +14,10 @@ describe("RGB Parsing", () => {
   ];
 
   const validRGBStringsAndTheirColorValues: [string, RGBColor][] = [
-    [ "#123456", { kind: "denormalized", red: 18, green: 52, blue: 86 }],
-    [ "#Fae", { kind: "denormalized", red: 255, green: 170, blue: 238 }],
-    [ "#abcdef", { kind: "denormalized", red: 171, green: 205, blue: 239 }],
-    [ "#ABCDEF", { kind: "denormalized", red: 171, green: 205, blue: 239 }],
+    [ "#123456", makeRGBColor(18, 52, 86) ],
+    [ "#Fae", makeRGBColor(255, 170, 238) ],
+    [ "#abcdef", makeRGBColor(171, 205, 239) ],
+    [ "#ABCDEF", makeRGBColor(171, 205, 239) ],
   ];
 
   it("Invalid rgb strings should return a null value", () => {
