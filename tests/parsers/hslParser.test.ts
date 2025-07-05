@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import hslParser from "../../src/parsers/HSLParser";
 import { HSLColor, makeHSLColor } from "../../src/color/HSL";
-import { assertIsNonNull } from "../test_utils/test_utils";
+import { assertIsNone, assertIsSome } from "../test_utils/test_utils";
+import { Optional } from "../../src/Monads/Optional";
 
 describe("HSL Parser", () => {
   it("Valid HSL strings should parse", () => {
@@ -12,7 +13,7 @@ describe("HSL Parser", () => {
     ];
 
     const results = validStringsAndTheirValues.map(
-      ([ str, expectedColor ]): [HSLColor | null, HSLColor] => [ hslParser(str), expectedColor ]);
+      ([ str, expectedColor ]): [Optional<HSLColor>, HSLColor] => [ hslParser(str), expectedColor ]);
 
     const isSameColor = (c1: HSLColor, c2: HSLColor): boolean => {
       return c1.hue === c2.hue &&
@@ -21,8 +22,8 @@ describe("HSL Parser", () => {
     };
 
     for (const [ actual, expected ] of results) {
-      assertIsNonNull(actual);
-      expect(isSameColor(actual, expected)).toBeTruthy();
+      assertIsSome(actual);
+      expect(isSameColor(actual.payload, expected)).toBeTruthy();
     }
   });
 
@@ -39,6 +40,7 @@ describe("HSL Parser", () => {
 
     const results = invalidHSLStrings.map(hslParser);
 
-    for (const res of results) expect(res).toBeNull();
+    for (const res of results) assertIsNone(res);
   });
+
 });

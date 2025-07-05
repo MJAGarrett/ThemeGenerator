@@ -1,59 +1,54 @@
 import { makeRGBColor, type RGBColor } from "../color/RGB";
+import { bind, map, none, Optional, some } from "../Monads/Optional";
 import { alternative, finishParse, nTimes, parseHexDigit, scanLetter, seq, seqR, type Parser } from "./utils";
 
 const rgbParser6Digits: Parser<RGBColor> = (string: string) => {
-  const parseTwoDigits = (string: string) => {
-    const res = seq(parseHexDigit)(parseHexDigit)(string);
-    if (res) {
-      const [ d1, d2 ] = res.result;
+  const parseTwoDigits: Parser<number> = (string) => {
+    return map(seq(parseHexDigit)(parseHexDigit)(string), ({ string, result }) => {
+      const [ d1, d2 ] = result;
       return {
-        string: res.string,
+        string,
         result: d1 * 16 + d2,
       };
-    }
-    return null;
+    });
   };
 
-  const res = seqR(scanLetter("#"))(nTimes(3)(parseTwoDigits))(string);
+  return bind(seqR(scanLetter("#"))(nTimes(3)(parseTwoDigits))(string), ({ string, result }) => {
+    const [ red, green, blue ] = result;
 
-  if (!res) return null;
-
-  const [ red, green, blue ] = res.result.flat();
-
-  try {
-    return {
-      string: res.string,
-      result: makeRGBColor(red, green, blue),
-    };
-  }
-  catch {
-    return null;
-  }
+    try {
+      return some({
+        string,
+        result: makeRGBColor(red, green, blue),
+      });
+    }
+    catch {
+      return none();
+    }
+  });
 };
 
 const rgbParser3Digits: Parser<RGBColor> = (string: string) => {
-  const res = seqR(scanLetter("#"))(nTimes(3)(parseHexDigit))(string);
+  return bind(seqR(scanLetter("#"))(nTimes(3)(parseHexDigit))(string), ({ string, result }) => {
+    const [ red, green, blue ] = result;
 
-  if (!res) return null;
-
-  const [ red, green, blue ] = res.result.flat();
-
-  try {
-    return {
-      string: res.string,
-      result: makeRGBColor(
-        red * 16 + red,
-        green * 16 + green,
-        blue * 16 + blue,
-      ),
-    };
-  }
-  catch {
-    return null;
-  }
+    try {
+      return some({
+        string,
+        result: makeRGBColor(
+          red * 16 + red,
+          green * 16 + green,
+          blue * 16 + blue,
+        ),
+      });
+    }
+    catch {
+      return none();
+    }
+  });
 };
 
-const rgbParser: (str: string) => RGBColor | null =
+const rgbParser: (str: string) => Optional<RGBColor> =
   finishParse(alternative(rgbParser6Digits)(rgbParser3Digits));
 
 export default rgbParser;

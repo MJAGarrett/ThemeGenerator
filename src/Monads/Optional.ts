@@ -29,3 +29,16 @@ export const some = <T>(val: T): Some<T> => {
 export const extract = <T>(val: Some<T>): T => {
   return val.payload;
 };
+
+export const map = <T, U>(opt: Optional<T>, f: (a: T) => U): Optional<U> => {
+  return isNone(opt) ? opt : some(f(opt.payload));
+};
+
+export const bind = <T, U>(a: Optional<T>, f: (a: T) => Optional<U>) => {
+  return isNone(a) ? a : f(a.payload);
+};
+
+export const optional = <T, U, V>(val: Optional<T>, onSome: (t: T) => U, default_value: V) => {
+  if (isSome(val)) return onSome(val.payload);
+  return default_value;
+};

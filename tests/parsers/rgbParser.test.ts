@@ -2,7 +2,8 @@ import { makeRGBColor, RGBColor } from "../../src/color/RGB";
 import rgbParser from "../../src/parsers/RGBParser";
 
 import { it, expect, describe } from "vitest";
-import { assertIsNonNull } from "../test_utils/test_utils";
+import { assertIsNone, assertIsSome } from "../test_utils/test_utils";
+import { Optional } from "../../src/Monads/Optional";
 
 describe("RGB Parsing", () => {
   const invalidRGBStrings = [
@@ -23,12 +24,12 @@ describe("RGB Parsing", () => {
   it("Invalid rgb strings should return a null value", () => {
     const results = invalidRGBStrings.map(rgbParser);
 
-    for (const res of results) expect(res).toBeNull();
+    for (const res of results) assertIsNone(res);
   });
 
   it("Valid rgb strings should return a color value", () => {
     const results = validRGBStringsAndTheirColorValues.map(
-      ([ str, expectedColor ]): [RGBColor | null, RGBColor] => [ rgbParser(str), expectedColor ],
+      ([ str, expectedColor ]): [Optional<RGBColor>, RGBColor] => [ rgbParser(str), expectedColor ],
     );
 
     const isSameColor = (color1: RGBColor, color2: RGBColor): boolean => {
@@ -38,8 +39,8 @@ describe("RGB Parsing", () => {
     };
 
     for (const [ actual, expected ] of results) {
-      assertIsNonNull(actual);
-      expect(isSameColor(actual, expected)).toBeTruthy();
+      assertIsSome(actual);
+      expect(isSameColor(actual.payload, expected)).toBeTruthy();
     }
   });
 });

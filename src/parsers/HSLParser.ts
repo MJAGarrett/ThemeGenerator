@@ -1,44 +1,54 @@
 import { HSLColor, makeHSLColor } from "../color/HSL";
-import { alternative, finishParse, parseNumber, Parser, scanLetter, seqL, seqR, skipWhitespaceBetween } from "./utils";
+import { bind, none, some } from "../Monads/Optional";
+import { alternative, finishParse, ignoreWhitespace, parseNumber, Parser, scanLetter, seqL, seqR } from "./utils";
 
 const hslParser_imp: Parser<HSLColor> = (string) => {
-  const r1 =
-    seqR(scanHSLLiteral)(seqR(scanLetter("("))(skipWhitespaceBetween(parseNumber)))(string);
-  if (!r1) return null;
+  const liftedIgnoreWS = (str: string) => some(ignoreWhitespace(str));
 
-  const r2 =
-    seqR(
-      skipWhitespaceBetween(scanLetter(",")))(
-      parsePercent)(
-      r1.string);
+  const ignoreWSBefore = <T>(p: Parser<T>): Parser<T> => {
+    return seqR(liftedIgnoreWS)(p);
+  };
 
-  if (!r2) return null;
+  return bind(seqR(scanHSLLiteral)(ignoreWSBefore(parseNumber))(string),
+    ({ string, result }) => {
+      const hue = result;
+      const r2 = seqR(ignoreWSBefore(scanLetter(",")))(ignoreWSBefore(parsePercent))(string);
 
-  const r3 =
-    seqR(
-      skipWhitespaceBetween(scanLetter(",")))(
-      seqL(parsePercent)(skipWhitespaceBetween(scanLetter(")"))))(
-      r2.string);
+      return bind(r2,
+        ({ string, result }) => {
 
-  if (!r3) return null;
+          const sat = result;
+          const r3 = seqR(ignoreWSBefore(scanLetter(",")))(ignoreWSBefore(parsePercent))(string);
 
-  try {
-    return {
-      string: r3.string,
-      result: makeHSLColor(r1.result, r2.result, r3.result),
-    };
-  }
-  catch {
-    return null;
-  }
+          return bind(r3, ({ string, result }) => {
+            const lightness = result;
+
+            return bind(seqL(ignoreWSBefore(scanLetter(")")))(liftedIgnoreWS)(string),
+              (r4) => {
+                try {
+                  return some({
+                    string: r4.string,
+                    result: makeHSLColor(hue, sat, lightness),
+                  });
+                }
+                catch {
+                  return none();
+                }
+              });
+          });
+        });
+    },
+  );
+
 };
 
 const scanHSLLiteral: Parser<string> = (() => {
   const scanH = alternative(scanLetter("h"))(scanLetter("H"));
   const scanS = alternative(scanLetter("s"))(scanLetter("S"));
   const scanL = alternative(scanLetter("l"))(scanLetter("L"));
+  const scanOpeningParen = scanLetter("(");
 
-  return seqR(scanH)(seqR(scanS)(scanL));
+  return seqR(seqR(scanH)(seqR(scanS)(scanL)))(scanOpeningParen);
 })();
 
 const parsePercent = seqL(parseNumber)(scanLetter("%"));

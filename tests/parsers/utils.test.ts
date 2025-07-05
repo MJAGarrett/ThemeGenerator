@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { alternative, optional, parseNumber, scanLetter, seq, seqL, seqR } from "../../src/parsers/utils";
-import { isNone, isSome, Some } from "../../src/Monads/Optional";
-import { assertIsNonNull } from "../test_utils/test_utils";
+import { extract, isNone, isSome, Some } from "../../src/Monads/Optional";
+import { assertIsNone, assertIsSome } from "../test_utils/test_utils";
 
 describe("Utility Parsers", () => {
   describe("ScanLetter", () => {
@@ -9,19 +9,19 @@ describe("Utility Parsers", () => {
 
     it("should return the parsed string and the letter on successful parse", () => {
       const res = scanA("Apple");
-      assertIsNonNull(res);
+      assertIsSome(res);
 
       const {
         string,
         result,
-      } = res;
+      } = extract(res);
 
       expect(string === "pple").toBeTruthy();
       expect(result === "A").toBeTruthy();
     });
 
-    it("should return null on a failed parse", () => {
-      expect(scanA("Failure")).toBeNull();
+    it("should return none on a failed parse", () => {
+      expect(isNone(scanA("Failure"))).toBeTruthy();
     });
   });
 
@@ -32,18 +32,18 @@ describe("Utility Parsers", () => {
       const res1 = A_or_a("A string");
       const res2 = A_or_a("a undercase string");
 
-      assertIsNonNull(res1);
-      assertIsNonNull(res2);
+      assertIsSome(res1);
+      assertIsSome(res2);
 
-      expect(res1.string === " string").toBeTruthy();
-      expect(res1.result === "A").toBeTruthy();
+      expect(res1.payload.string === " string").toBeTruthy();
+      expect(res1.payload.result === "A").toBeTruthy();
 
-      expect(res2.string === " undercase string").toBeTruthy();
-      expect(res2.result === "a").toBeTruthy();
+      expect(res2.payload.string === " undercase string").toBeTruthy();
+      expect(res2.payload.result === "a").toBeTruthy();
     });
 
     it("should return null if neither parser can successfully parse the input", () => {
-      expect(A_or_a("Failure!")).toBeNull();
+      expect(isNone(A_or_a("Failure!"))).toBeTruthy();
     });
   });
 
@@ -53,15 +53,15 @@ describe("Utility Parsers", () => {
       const scanAthenB = seq(scanLetter("A"))(scanLetter("B"));
 
       it("should return null if either constituent parser fails to parse", () => {
-        expect(scanAthenB("Total Failure")).toBeNull();
-        expect(scanAthenB("A partial Failure")).toBeNull();
+        assertIsNone(scanAthenB("Total Failure"));
+        assertIsNone(scanAthenB("A partial Failure"));
       });
 
       it("should combine the results of both parsers on a successful parse", () => {
         const res = scanAthenB("AB Success");
 
-        assertIsNonNull(res);
-        const { string, result } = res;
+        assertIsSome(res);
+        const { string, result } = extract(res);
 
         expect(string).toBe(" Success");
         expect(result).toEqual([ "A", "B" ]);
@@ -72,16 +72,18 @@ describe("Utility Parsers", () => {
       const scanAandIgnoreB = seqL(scanLetter("A"))(scanLetter("B"));
 
       it("should return null if either parser failed to parse input", () => {
-        expect(scanAandIgnoreB("AFailure")).toBeNull();
-        expect(scanAandIgnoreB("Total Failure")).toBeNull();
+        assertIsNone(scanAandIgnoreB("AFailure"));
+        assertIsNone(scanAandIgnoreB("Total Failure"));
       });
 
       it("should return the result of the left parser on a successful parse", () => {
         const res = scanAandIgnoreB("AB rest");
-        assertIsNonNull(res);
+        assertIsSome(res);
 
-        expect(res.string === " rest");
-        expect(res.result === "A");
+        const { string, result } = extract(res);
+
+        expect(string === " rest").toBeTruthy();
+        expect(result === "A").toBeTruthy();
       });
     });
 
@@ -89,16 +91,18 @@ describe("Utility Parsers", () => {
       const ignoreAandScanB = seqR(scanLetter("A"))(scanLetter("B"));
 
       it("should return null if either parser failed to parse input", () => {
-        expect(ignoreAandScanB("AFailure")).toBeNull();
-        expect(ignoreAandScanB("Total Failure")).toBeNull();
+        assertIsNone(ignoreAandScanB("AFailure"));
+        assertIsNone(ignoreAandScanB("Total Failure"));
       });
 
       it("should return the result of the right parser on a successful parse", () => {
         const res = ignoreAandScanB("AB rest");
-        assertIsNonNull(res);
+        assertIsSome(res);
 
-        expect(res.string === " rest");
-        expect(res.result === "B");
+        const { string, result } = extract(res);
+
+        expect(string === " rest").toBeTruthy();
+        expect(result === "B").toBeTruthy();
       });
     });
   });
@@ -126,8 +130,8 @@ describe("Utility Parsers", () => {
 
       const res = parseNumber(integer);
 
-      assertIsNonNull(res);
-      const { string, result } = res;
+      assertIsSome(res);
+      const { string, result } = extract(res);
       expect(string).toBe("");
       expect(result).toBe(-12);
     });
@@ -137,8 +141,8 @@ describe("Utility Parsers", () => {
 
       const res = parseNumber(decimal);
 
-      assertIsNonNull(res);
-      const { string, result } = res;
+      assertIsSome(res);
+      const { string, result } = extract(res);
       expect(string).toBe("");
       expect(result).toBe(12.41);
     });
@@ -148,8 +152,8 @@ describe("Utility Parsers", () => {
 
       const res = parseNumber(number);
 
-      assertIsNonNull(res);
-      const { string, result } = res;
+      assertIsSome(res);
+      const { string, result } = extract(res);
       expect(string).toBe(".");
       expect(result).toBe(44112);
     });

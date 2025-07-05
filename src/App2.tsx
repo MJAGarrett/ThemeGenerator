@@ -4,19 +4,16 @@ import rgbParser from "./parsers/RGBParser";
 import hslParser from "./parsers/HSLParser";
 import { HSLToRGB, RGBToHSL } from "./color/Conversions";
 import { formatHSLString, normalizeHSL } from "./color/HSL";
+import { extract, isSome, optional } from "./Monads/Optional";
 
 type Strategy = (string: string) => string;
 
 const RGBStrategy: Strategy = (str) => {
-  const res = rgbParser(str);
-  if (!res) return "";
-  else return formatRGBString(normalizeRGB(res));
+  return optional(rgbParser(str), (str)=>formatRGBString(normalizeRGB(str)), "");
 };
 
 const HSLStrategy: Strategy = (str) => {
-  const res = hslParser(str);
-  if (!res) return "";
-  else return formatHSLString(normalizeHSL(res));
+  return optional(hslParser(str), (res) => formatHSLString(normalizeHSL(res)), "");
 };
 
 const ColorCanvas = (props: { color: string, width: number, height: number }) => {
@@ -54,14 +51,16 @@ const App2 = () => {
   const onSelection = (selection: "rgb" | "hsl"): void => {
     if (selection === "rgb") {
       setStrategy(() => RGBStrategy);
+
       const hsl = hslParser(input);
-      if (hsl) setInput(formatRGBString(HSLToRGB(normalizeHSL(hsl))));
+      if (isSome(hsl)) setInput(formatRGBString(HSLToRGB(normalizeHSL(extract(hsl)))));
       else setInput("#");
     }
     else if (selection === "hsl") {
       setStrategy(() => HSLStrategy);
+
       const rgb = rgbParser(input);
-      if (rgb) setInput(formatHSLString(RGBToHSL(normalizeRGB(rgb))));
+      if (isSome(rgb)) setInput(formatHSLString(RGBToHSL(normalizeRGB(extract(rgb)))));
       else setInput("hsl()");
     }
   };
