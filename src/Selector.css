@@ -1,0 +1,98 @@
+body {
+  color: var(--text2);
+  background-color: var(--surface2);
+}
+
+button {
+  appearance: none;
+  color: var(--text1);
+  font-size: 1rem;
+  padding: .5rem;
+  background-color: var(--surface1);
+  border-radius: .5rem;
+  border: solid 2px var(--surface3);
+  transition: all .25s ease-out;
+  outline: 4px solid transparent;
+  outline-offset: 2px;
+}
+
+button:hover {
+  background-color: var(--surface2);
+  border-color: var(--brand);
+}
+
+button:active {
+  background-color: var(--surface1);
+  border-color: var(--brand);
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline-color: var(--brand);
+  background-color: var(--surface4);
+}
+
+input[type="text"]::selection {
+  background-color: var(--brand);
+  color: var(--surface1);
+}
+
+input,
+select,
+option {
+  font-size: inherit;
+  color: var(--text1);
+  background-color: var(--surface3);
+  border: 2px solid var(--surface4);
+}
+
+option::checked {
+  color: var(--text2);
+  background-color: var(--surface1);
+}
+
+.theme-generator {
+  display: flex;
+  place-self: center;
+  flex-direction: column;
+  gap: 2rem;
+
+  padding: 1rem;
+  max-width: 1000px;
+}
+
+.theme-generator>* {
+  flex: 1 0 0;
+}
+
+.colorSelection {
+  display: flex;
+  line-height: 1.5;
+  align-items: center;
+  gap: 1em;
+  flex-direction: column;
+}
+
+.visualizers>*:not(:last-child) {
+  margin-bottom: .5rem;
+}
+
+@media (min-width: 600px) {
+  .colorSelection {
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+}
+
+@media (min-width: 1500px) {
+  .theme-generator {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    max-width: none;
+  }
+
+  .colorSelection {
+    flex-direction: column;
+  }
+}

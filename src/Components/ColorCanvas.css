@@ -1,0 +1,5 @@
+.colorCanvas {
+  position: relative;
+  border-radius: 50%;
+  border: .1rem solid black;
+}

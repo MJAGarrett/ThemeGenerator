@@ -1,3 +1,4 @@
+import { clamp } from "../utils/math_utils";
 import { HSLColorNormalized, makeHSLColorNormalized } from "./HSL";
 import { makeRGBColorNormalized, RGBColorNormalized } from "./RGB";
 
@@ -28,14 +29,14 @@ export function RGBToHSL(rgb: RGBColorNormalized): HSLColorNormalized {
   hue *= 60;
   if (hue < 0) hue += 360;
 
-  const lightness = (cmax + cmin) / 2;
-  const saturation = chroma === 0 ? 0 : chroma / (1 - Math.abs(2 * lightness - 1));
+  const lightness = clamp0To1((cmax + cmin) / 2);
+  const saturation = clamp0To1(chroma === 0 ? 0 : chroma / (1 - Math.abs(2 * lightness - 1)));
 
   return makeHSLColorNormalized(hue, saturation, lightness);
 }
 
 export function HSLToRGB({ hue, saturation, lightness }: HSLColorNormalized): RGBColorNormalized {
-  const H = hue;
+  const H = hue === 360 ? 0 : hue; // prevents H_Prime from being === 6 and breaking ifs below
   const S = saturation;
   const L = lightness;
 
@@ -64,8 +65,11 @@ export function HSLToRGB({ hue, saturation, lightness }: HSLColorNormalized): RG
     rgb = { red: chroma, green: 0, blue: X };
   }
 
-  const m = L - chroma / 2;
+  /** m should always be between 0 and 1, clamp to avoid rounding errors. */
+  const m = clamp0To1(L - chroma / 2);
   const { red, green, blue } = rgb;
 
   return makeRGBColorNormalized(red + m, green + m, blue + m);
 }
+
+const clamp0To1 = (v: number) => clamp(v, 0.0, 1.0);

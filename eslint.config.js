@@ -8,7 +8,7 @@ import stylistic from "@stylistic/eslint-plugin";
 
 
 export default tseslint.config([
-  globalIgnores([ "dist", "node_modules" ]),
+  globalIgnores([ "dist", "node_modules", "coverage" ]),
   {
     files: [ "**/*.{ts,tsx,js}" ],
     extends: [

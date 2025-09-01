@@ -33,6 +33,14 @@ export const isDenormalized = (hsl: HSL): hsl is HSLColor => {
   return hsl.kind === "denormalized";
 };
 
+/**
+ * Creates an HSL color. Throws if either sat or light are not in the
+ * range [0, 100], inclusive
+ * @param hue Any real number
+ * @param sat A real number in the range [0, 100]
+ * @param light A real number in the range [0, 100]
+ * @returns An HSLColor.
+ */
 export const makeHSLColor = (hue: number, sat: number, light: number): HSLColor => {
   return {
     kind: "denormalized",
@@ -42,6 +50,14 @@ export const makeHSLColor = (hue: number, sat: number, light: number): HSLColor 
   };
 };
 
+/**
+ * Creates a normalized HSL color. Throws if either sat or light are not in the
+ * range [0, 1], inclusive or if hue is not in the range [0, 360]
+ * @param hue A real number in the range [0, 360]
+ * @param sat A real number in the range [0, 1]
+ * @param light A real number in the range [0, 1]
+ * @returns A normalized HSLColor.
+ */
 export const makeHSLColorNormalized =
   (hue: number, sat: number, light: number): HSLColorNormalized => {
     return {
@@ -63,6 +79,16 @@ export const normalizeHSL =
       hue: makeCircleDegree(h),
       saturation: makeNormalized(s),
       lightness: makeNormalized(l),
+    };
+  };
+
+export const denormalizeHSL =
+  ({ hue, saturation, lightness }: HSLColorNormalized): HSLColor => {
+    return {
+      kind: "denormalized",
+      hue,
+      saturation: makeNumber0To100(saturation * 100),
+      lightness: makeNumber0To100(lightness * 100),
     };
   };
 
